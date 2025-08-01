@@ -12,6 +12,13 @@
 *mineru_models/
 *mineru_models/*
 
+*node_modules/
+*node_modules/*
+
+tmp/
+tmp
+temp/ 
+
 # 忽略pycharm的文件
 /.idea
 
@@ -22,7 +29,10 @@
 *.pdparams
 
 # 忽略所有vscode配置文件
-/.vscode
+.vscode/
+debug/
+*.pyc 
+*.pyd 
 
 # 忽略所有.ipynb_checkpoints
 **/.ipynb_checkpoints/*
