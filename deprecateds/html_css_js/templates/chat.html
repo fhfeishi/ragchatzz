@@ -1,0 +1,44 @@
+<!-- templates/chat.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>湖北文化助手</title>
+  <link rel="stylesheet" href="../static/css/chat.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <!-- 聊天头部 -->
+    <header>
+      <h2>💬 湖北文化助手</h2>
+      <a href="/" class="back-btn">← 首页</a>
+    </header>
+
+    <!-- 聊天内容区 -->
+    <main id="chat-box" class="chat-box">
+      <div class="message bot">
+        <p>你好！我是湖北文化助手，了解楚文化、历史遗迹、名人故事等。请问你想知道什么？</p>
+      </div>
+    </main>
+
+    <!-- 输入区域 -->
+    <div class="input-container">
+      <textarea 
+        id="user-input" 
+        placeholder="输入你的问题，回车发送..." 
+        autofocus
+        rows="1"
+      ></textarea>
+      <button id="send-btn" onclick="send()">📤</button>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loading" class="loading hidden">
+      <span>AI 正在思考...</span>
+    </div>
+  </div>
+
+  <script src="../static/js/chat.js"></script>
+</body>
+</html>

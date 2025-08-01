@@ -1,0 +1,2 @@
+# 把所有 .ipynb 当二进制处理，禁止文本 diff 和换行符转换
+*.ipynb binary  

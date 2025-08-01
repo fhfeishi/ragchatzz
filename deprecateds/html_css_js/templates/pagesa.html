@@ -1,0 +1,350 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>科研团队检索平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: #f8fafc;
+    }
+    .team-card {
+      transition: all 0.3s ease;
+      border: 1px solid #e2e8f0;
+    }
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border-color: #cbd5e1;
+    }
+    .leader-img {
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+    .product-img {
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V4m8 0h-4" />
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3">
+            <h1 class="text-xl font-semibold text-gray-900">科研团队合作平台</h1>
+            <p class="text-sm text-gray-500">寻找理想的科研合作伙伴</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="搜索科研领域..." 
+              class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+          <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            高级搜索
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Search Filters -->
+    <div class="mb-8">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">筛选条件</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">研究领域</label>
+            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option>人工智能</option>
+              <option>生物医学</option>
+              <option>材料科学</option>
+              <option>环境工程</option>
+              <option>量子计算</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">机构类型</label>
+            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option>高校</option>
+              <option>科研院所</option>
+              <option>企业研发</option>
+              <option>医疗机构</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">合作模式</label>
+            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option>联合研发</option>
+              <option>技术转让</option>
+              <option>人才培养</option>
+              <option>共建实验室</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">地理位置</label>
+            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option>全国</option>
+              <option>京津冀</option>
+              <option>长三角</option>
+              <option>粤港澳</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <h2 class="text-2xl font-bold text-gray-900">检索结果 (12)</h2>
+      <div class="flex items-center space-x-3">
+        <span class="text-sm text-gray-500">排序方式：</span>
+        <select class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option>相关度</option>
+          <option>最新加入</option>
+          <option>合作热度</option>
+          <option>成果数量</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Team Cards Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <!-- Team Card 1 -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden team-card">
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="badge bg-blue-100 text-blue-800">人工智能</span>
+            <div class="flex space-x-1">
+              <span class="text-xs text-gray-500">⭐ 4.8</span>
+              <span class="text-xs text-gray-400">|</span>
+              <span class="text-xs text-gray-500">合作 15 次</span>
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-4 mb-6">
+            <img 
+              src="https://placehold.co/80x80/3b82f6/ffffff?text=李" 
+              alt="李明教授" 
+              class="w-20 h-20 rounded-lg leader-img"
+            />
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900 mb-1">李明 教授</h3>
+              <p class="text-sm text-gray-600 mb-1">清华大学计算机科学与技术系</p>
+              <p class="text-sm text-gray-500">博士生导师 | 国家杰出青年基金获得者</p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">团队简介</h4>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              专注于深度学习与计算机视觉研究，在目标检测、图像分割等领域取得突破性进展。团队拥有20余名研究人员，近五年发表顶会论文50余篇。
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">代表成果</h4>
+            <img 
+              src="https://placehold.co/400x300/6366f1/ffffff?text=智能视觉分析系统" 
+              alt="智能视觉分析系统" 
+              class="w-full rounded-lg product-img"
+            />
+            <p class="text-sm text-gray-600 mt-2">智能视觉分析系统 - 基于深度学习的多模态视觉理解平台</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">计算机视觉</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">深度学习</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">目标检测</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">图像分割</span>
+          </div>
+
+          <div class="flex space-x-3">
+            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              查看详情
+            </button>
+            <button class="flex-1 border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              联系合作
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Card 2 -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden team-card">
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="badge bg-green-100 text-green-800">生物医学</span>
+            <div class="flex space-x-1">
+              <span class="text-xs text-gray-500">⭐ 4.9</span>
+              <span class="text-xs text-gray-400">|</span>
+              <span class="text-xs text-gray-500">合作 23 次</span>
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-4 mb-6">
+            <img 
+              src="https://placehold.co/80x80/10b981/ffffff?text=王" 
+              alt="王芳研究员" 
+              class="w-20 h-20 rounded-lg leader-img"
+            />
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900 mb-1">王芳 研究员</h3>
+              <p class="text-sm text-gray-600 mb-1">中科院上海生命科学研究院</p>
+              <p class="text-sm text-gray-500">国家重点实验室主任</p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">团队简介</h4>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              专注于肿瘤免疫治疗研究，在CAR-T细胞疗法和肿瘤微环境调控方面取得重要突破。团队拥有先进的实验平台和丰富的临床转化经验。
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">代表成果</h4>
+            <img 
+              src="https://placehold.co/400x300/10b981/ffffff?text=新型CAR-T疗法" 
+              alt="新型CAR-T疗法" 
+              class="w-full rounded-lg product-img"
+            />
+            <p class="text-sm text-gray-600 mt-2">新型CAR-T细胞疗法 - 针对实体瘤的靶向免疫治疗方案</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">肿瘤免疫</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">CAR-T</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">细胞治疗</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">精准医疗</span>
+          </div>
+
+          <div class="flex space-x-3">
+            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              查看详情
+            </button>
+            <button class="flex-1 border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              联系合作
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Card 3 -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden team-card">
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <span class="badge bg-purple-100 text-purple-800">材料科学</span>
+            <div class="flex space-x-1">
+              <span class="text-xs text-gray-500">⭐ 4.7</span>
+              <span class="text-xs text-gray-400">|</span>
+              <span class="text-xs text-gray-500">合作 18 次</span>
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-4 mb-6">
+            <img 
+              src="https://placehold.co/80x80/8b5cf6/ffffff?text=张" 
+              alt="张伟教授" 
+              class="w-20 h-20 rounded-lg leader-img"
+            />
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900 mb-1">张伟 教授</h3>
+              <p class="text-sm text-gray-600 mb-1">浙江大学材料科学与工程学院</p>
+              <p class="text-sm text-gray-500">国家重大研发计划首席科学家</p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">团队简介</h4>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              专注于新型功能材料研发，在纳米材料、智能响应材料等领域取得系列创新成果。团队与多家企业建立长期合作关系，成果转化率高。
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-3">代表成果</h4>
+            <img 
+              src="https://placehold.co/400x300/8b5cf6/ffffff?text=智能响应材料" 
+              alt="智能响应材料" 
+              class="w-full rounded-lg product-img"
+            />
+            <p class="text-sm text-gray-600 mt-2">智能响应材料 - 可随环境变化调节性能的新型复合材料</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">纳米材料</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">功能材料</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">智能材料</span>
+            <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">复合材料</span>
+          </div>
+
+          <div class="flex space-x-3">
+            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              查看详情
+            </button>
+            <button class="flex-1 border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              联系合作
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-center">
+      <nav class="inline-flex rounded-md shadow">
+        <a href="#" class="rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">上一页</a>
+        <a href="#" class="border border-gray-300 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600">1</a>
+        <a href="#" class="border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">2</a>
+        <a href="#" class="border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">3</a>
+        <a href="#" class="rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">下一页</a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="text-center">
+        <p class="text-sm text-gray-500">
+          © 2024 科研团队合作平台. 促进科技创新与产业融合发展.
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+```

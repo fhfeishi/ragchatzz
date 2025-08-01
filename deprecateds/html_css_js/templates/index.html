@@ -1,0 +1,106 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>湖北文化问答助手</title>
+  <link rel="stylesheet" href="../static/css/style.css" />
+  <style>
+    /* 主页专用样式（也可写入 style.css） */
+    .home-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      background: linear-gradient(135deg, #a8e6cf, #dcecc9);
+      padding: 20px;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+
+    .home-title {
+      font-size: 2.2em;
+      color: #1b5e20;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease;
+    }
+
+    .home-subtitle {
+      font-size: 1.1em;
+      color: #33691e;
+      margin-bottom: 40px;
+      max-width: 500px;
+    }
+
+    .shark-icon {
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 50%;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .shark-icon:hover {
+      transform: scale(1.1) rotate(10deg);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .enter-text {
+      margin-top: 20px;
+      font-size: 1em;
+      color: #2e7d32;
+      font-weight: bold;
+      opacity: 0.9;
+    }
+
+    .shark-icon {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(46, 125, 50, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+      }
+    }
+
+    .enter-text:hover {
+      text-decoration: underline;
+    }
+    /* 动画 */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="home-container">
+    <h1 class="home-title">🌊 湖北文化智能问答助手</h1>
+    <p class="home-subtitle">基于本地知识库的 RAG 对话系统，了解楚文化、历史遗迹、名人故事</p>
+
+    <!-- RAG-Agent图标 -->
+    <img src="../static/res/shark.png" alt="点击开始对话" class="shark-icon" onclick="enterChat()" />
+
+    <!-- 提示文字 -->
+    <div class="enter-text" onclick="enterChat()" style="cursor: pointer;">
+      点击图标开始对话(qwen3:4b)
+    </div>
+  </div>
+
+  <script src="../static/js/main.js"></script>
+</body>
+</html>

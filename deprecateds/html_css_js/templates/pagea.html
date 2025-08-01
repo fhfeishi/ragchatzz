@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>智能体对话界面</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .sidebar-transition {
+      transition: transform 0.3s ease-in-out;
+    }
+    .message {
+      transition: opacity 0.2s ease;
+    }
+    .message:hover {
+      background-color: #f9fafb;
+    }
+    .sidebar-group-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 h-screen flex">
+  <!-- Sidebar -->
+  <div id="sidebar" class="bg-white w-80 flex flex-col border-r border-gray-200 flex-shrink-0 sidebar-transition">
+    <!-- Sidebar Header -->
+    <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+      <h1 class="text-xl font-semibold text-gray-900">对话记录</h1>
+      <button id="toggleSidebar" class="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="p-4">
+      <div class="relative">
+        <input 
+          type="text" 
+          placeholder="搜索对话..." 
+          class="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Conversation List -->
+    <div class="flex-1 overflow-y-auto px-2">
+      <!-- Today -->
+      <div class="sidebar-group-title">今天</div>
+      <div class="space-y-1">
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">关于项目进度的讨论</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">15:30</span>
+        </div>
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 bg-blue-50 text-blue-900 font-medium flex items-center justify-between group">
+          <div class="truncate">智能体功能优化建议</div>
+          <span class="text-xs text-blue-700">10:15</span>
+        </div>
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">技术方案评审会议</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">09:00</span>
+        </div>
+      </div>
+
+      <!-- Yesterday -->
+      <div class="sidebar-group-title">昨天</div>
+      <div class="space-y-1">
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">产品需求文档确认</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">16:45</span>
+        </div>
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">UI设计稿反馈</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">14:20</span>
+        </div>
+      </div>
+
+      <!-- Past 7 Days -->
+      <div class="sidebar-group-title">过去七天</div>
+      <div class="space-y-1">
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">季度目标规划</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">周三</span>
+        </div>
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">团队建设活动安排</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">周一</span>
+        </div>
+        <div class="px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 flex items-center justify-between group">
+          <div class="truncate">技术选型调研</div>
+          <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100">上周五</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Conversation Button -->
+    <div class="p-4 border-t border-gray-200">
+      <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        新建对话
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <button id="toggleSidebarDesktop" class="lg:hidden mr-4 p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h2 class="text-lg font-semibold text-gray-900">智能体对话</h2>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span class="text-sm text-gray-600">在线</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <!-- User Message -->
+        <div class="flex justify-end">
+          <div class="bg-blue-600 text-white rounded-2xl rounded-tr-none px-6 py-3 max-w-3xl">
+            <p class="text-sm">帮我优化一下这个智能体的对话界面，侧栏有一系列对话记录，并且按照时间进行分组，然后可以收起左侧边栏。</p>
+          </div>
+        </div>
+
+        <!-- AI Message -->
+        <div class="flex">
+          <div class="bg-white rounded-2xl rounded-tl-none px-6 py-3 shadow-sm border border-gray-200 max-w-3xl">
+            <p class="text-sm text-gray-800 mb-2">好的，我已经理解了您的需求。这是一个优化后的智能体对话界面设计，包含：</p>
+            <ul class="text-sm text-gray-700 space-y-1 ml-4">
+              <li>• 侧边栏对话记录分组（今天、昨天、过去七天）</li>
+              <li>• 响应式设计，支持收起/展开侧边栏</li>
+              <li>• 搜索功能和新建对话按钮</li>
+              <li>• 清晰的消息气泡设计</li>
+            </ul>
+            <div class="mt-3 text-xs text-gray-500">设计采用了现代简洁风格，注重用户体验和交互细节。</div>
+          </div>
+        </div>
+
+        <!-- User Message -->
+        <div class="flex justify-end">
+          <div class="bg-blue-600 text-white rounded-2xl rounded-tr-none px-6 py-3 max-w-3xl">
+            <p class="text-sm">看起来很不错！侧边栏的分组效果很清晰。</p>
+          </div>
+        </div>
+
+        <!-- AI Message -->
+        <div class="flex">
+          <div class="bg-white rounded-2xl rounded-tl-none px-6 py-3 shadow-sm border border-gray-200 max-w-3xl">
+            <p class="text-sm text-gray-800">谢谢！这个设计还包含了以下特性：</p>
+            <ul class="text-sm text-gray-700 space-y-1 ml-4 mt-2">
+              <li>• 悬停效果增强交互反馈</li>
+              <li>• 时间戳显示在对话项右侧</li>
+              <li>• 当前对话高亮显示</li>
+              <li>• 移动端适配，小屏幕时侧边栏可收起</li>
+            </ul>
+            <div class="mt-3 text-xs text-gray-500">您可以根据实际需求进一步调整颜色、间距等细节。</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Input Area -->
+    <div class="bg-white border-t border-gray-200 p-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex space-x-2">
+          <div class="flex-1 relative">
+            <textarea 
+              placeholder="输入消息..." 
+              class="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows="1"
+            ></textarea>
+            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10v4a2 2 0 002 2h2a2 2 0 002-2v-4M9 10V9a2 2 0 012-2h2a2 2 0 012 2v1" />
+              </svg>
+            </button>
+          </div>
+          <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center">
+            <span>发送</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle sidebar on mobile
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const toggleSidebarDesktop = document.getElementById('toggleSidebarDesktop');
+    const sidebar = document.getElementById('sidebar');
+    
+    function toggleSidebarFunc() {
+      sidebar.classList.toggle('-translate-x-full');
+    }
+    
+    toggleSidebar.addEventListener('click', toggleSidebarFunc);
+    toggleSidebarDesktop.addEventListener('click', toggleSidebarFunc);
+    
+    // On larger screens, ensure sidebar is visible
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('-translate-x-full');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+      }
+    });
+    
+    // Initialize sidebar state
+    if (window.innerWidth >= 1024) {
+      sidebar.classList.remove('-translate-x-full');
+    } else {
+      sidebar.classList.add('-translate-x-full');
+    }
+  </script>
+</body>
+</html>

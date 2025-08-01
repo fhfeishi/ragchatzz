@@ -1,0 +1,164 @@
+/* static/css/chat.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f7fb;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .chat-container {
+    width: 100%;
+    max-width: 800px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* 头部 */
+  header {
+    padding: 16px 20px;
+    background: #007bff;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+  }
+  
+  /* 聊天内容区 */
+  .chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fafafa;
+  }
+  
+  .message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.55;
+    animation: fadeIn 0.3s ease;
+    word-wrap: break-word;
+  }
+  
+  .message p {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: 1em;
+  }
+  
+  .user {
+    align-self: flex-end;
+    background: #007bff;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  
+  .bot {
+    align-self: flex-start;
+    background: #f1f3f5;
+    color: #202124;
+    border-bottom-left-radius: 4px;
+  }
+  
+  /* 输入区域 */
+  .input-container {
+    display: flex;
+    padding: 12px 16px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    gap: 8px;
+  }
+  
+  textarea#user-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    resize: none;
+    outline: none;
+    font-size: 1em;
+    max-height: 120px;
+    line-height: 1.5;
+  }
+  
+  textarea#user-input:focus {
+    border-color: #007bff;
+  }
+  
+  #send-btn {
+    width: 44px;
+    height: 44px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  
+  #send-btn:hover {
+    background: #0056b3;
+  }
+  
+  /* 加载状态 */
+  .loading {
+    text-align: center;
+    padding: 8px;
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  /* 动画 */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* 响应式 */
+  @media (max-width: 600px) {
+    .chat-container {
+      border: none;
+      height: 100vh;
+    }
+    .message {
+      max-width: 90%;
+    }
+  }
