@@ -5,7 +5,7 @@ from typing import List, Union
 from tqdm import tqdm
 
 # 使用 Unstructured 更好地解析 Markdown 中的图片链接
-from langchain_community.document_loaders import PyPDFLoader, UnstructuredMarkdownLoader
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
