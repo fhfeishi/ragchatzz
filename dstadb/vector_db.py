@@ -1,5 +1,6 @@
-# vector_db.py   将图文markdown写入向量数据库
-import sys, os, hashlib, re 
+# /dataDB/vector_db.py
+#   将 < 图文markdown > 写入向量数据库 chroma_db
+import os, hashlib, re, uuid 
 from pathlib import Path
 from typing import List, Union
 from tqdm import tqdm
@@ -10,6 +11,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import OllamaEmbeddings
+from langchain_community.vectorstores.utils import filter_complex_metadata # 过滤复杂元数据 chroma只支持: str int float bool None
+
 
 class VectorIngestor:
     def __init__(self, config: dict):
@@ -18,21 +21,32 @@ class VectorIngestor:
         self.vectordb = self._init_vectorstore()
 
     def _load_embedding_model(self):
-        model = self.config["embed_model"]
+        modeln = self.config["embed_model"]
         base_url = self.config.get("base_url")
         device = self.config.get("device", "cpu")
 
-        if model.startswith("ollama:"):
-            model_name = model[7:]
+        if modeln.startswith("ollama:"):
+            model_name = modeln[7:]
             print(f"[*] 使用 Ollama 嵌入模型: {model_name}")
             return OllamaEmbeddings(model=model_name, base_url=base_url)
 
         else:
-            print(f"[*] 使用 HuggingFace 嵌入模型: {model}")
+            print(f"[*] 使用 HuggingFace 嵌入模型: {modeln}")
+            
+            # 判断是否是本地路径下加载模型
+            local_model_dir = self.config.get("model_dir_local", "")
+            if Path(local_model_dir).exists() and Path(local_model_dir).is_dir():
+                print(f"[*] 从本地加载嵌入模型: {local_model_dir}")
+                model_path_orn = local_model_dir
+            else:
+                print(f"[*] 本地模型路径不存在，尝试从 HuggingFace (或者.cache缓存) 加载: {modeln}")
+                model_path_orn = modeln
+            print(f"✅ 模型加载完成: {modeln}")
             return HuggingFaceEmbeddings(
-                model_name=model,
+                model_name=model_path_orn,  # model_path or model_name
                 model_kwargs={"device": device},
                 encode_kwargs={"normalize_embeddings": True},
+                cache_folder=None,  # 不使用额外缓存
             )
 
     def _init_vectorstore(self) -> Chroma:
@@ -64,7 +78,7 @@ class VectorIngestor:
                 # 加载所有 .md 文件
                 for md_file in md_dir.glob("*.md"):
                     try:
-                        loader = UnstructuredMarkdownLoader(str(md_file), mode="elements")
+                        loader = UnstructuredMarkdownLoader(str(md_file), mode="elements")  # single 
                         loaded_docs = loader.load()
 
                         for doc in loaded_docs:
@@ -124,11 +138,12 @@ class VectorIngestor:
         return chunks
 
     @staticmethod
-    def make_id(doc) -> str:
+    def make_id(doc, index: int) -> str:
+        # 多个文档块的内容可能完全相同（尤其是短文本或重复段落），导致 ID 重复，ChromaDB 拒绝插入重复 ID。用uuid随机数编码一下
         content = doc.page_content.strip()
-        sha = hashlib.sha1(content.encode("utf-8")).hexdigest()[:16]
+        sha = hashlib.sha1(content.encode("utf-8")).hexdigest()[:8]
         stem = Path(doc.metadata.get("source_path", "chunk")).stem
-        return f"{sha}_{stem}"
+        return f"{sha}_{stem}_{index}_{uuid.uuid4().hex[:4]}"
 
     def get_existing_ids(self) -> set:
         try:
@@ -138,13 +153,16 @@ class VectorIngestor:
             return set()
 
     def ingest(self):
-        raw_docs = self.load_docs(self.config["docs_root"])
+        raw_docs = self.load_docs(self.config["docs_roots"])
+        # 过滤掉不支持的字符
+        raw_docs = filter_complex_metadata(raw_docs)
         if not raw_docs:
             print("[WARN] 没有找到任何文档，终止索引。")
             return
         
         chunks = self.split_docs(raw_docs, self.config["chunk_size"], self.config["chunk_overlap"])
-        chunk_ids = [self.make_id(chunk) for chunk in chunks]
+        
+        chunk_ids = [self.make_id(chunk, i) for i, chunk in enumerate(chunks)]
 
         existing_ids = self.get_existing_ids()
         to_add = [(chunk, cid) for chunk, cid in zip(chunks, chunk_ids) if cid not in existing_ids]
@@ -169,23 +187,37 @@ class VectorIngestor:
 if __name__ =="__main__": 
     # config 
     DEFAULT_CONFIG = {
-    "roots": [
-        r".\docs.log\zhuanli_RobotFeet",
-        r".\docs.log\zhuanli_RobotHand"
+    "docs_roots": [
+        r"..\docs.log\zhuanli_RobotFeet",
+        r"..\docs.log\zhuanli_RobotHand"
     ],
-    "store_dir": "./docs.log/chroma_db/.zhuanli_vectdb",
+    "model_dir_local": "../temp/mineru_models/Qwen3-Embedding-0.6B",
+    "store_dir": "../docs.log/chroma_db/.zhuanli_vectdb",
     "collection_name": "multi_domain_knowledge",
     "embed_model": "Qwen/Qwen3-Embedding-0.6B",
-    "chunk_size": 480,
+    "chunk_size": 480,  # 
     "chunk_overlap": 128,
     "batch_size": 16,
     "base_url": "http://localhost:11434",
-    "device": "cuda" if os.environ.get("CUDA_VISIBLE_DEVICES", "") != "" else "cpu",
+    "device": "cpu",
 }
     ingestor = VectorIngestor(DEFAULT_CONFIG)
     ingestor.ingest()
     
+    # 带图片的markdown解析成什么样了？  这里可能遗漏了很多信息、或者说有非常多重复的短片段（段片段哪来的  chunk_size=480啊）
+    # 分块之后数据是怎么样的？  这个也可以后续检索测试部分查看-
+    
+    
+    # temp\mineru_models\models--Qwen--Qwen3-Embedding-0.6B
+    # temp/mineru_models/models--Qwen--Qwen3-Embedding-0.6B
+    
       
+
+
+
+
+
+
 
 
 

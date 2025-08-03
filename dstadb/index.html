@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>RAG with Images</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background:#fafafa; }
+    .card { background:#fff; border:1px solid #ddd; border-radius:8px; margin-bottom:1.5rem; padding:1rem; }
+    .score { font-size:0.8rem; color:#555; }
+    .imgs img { max-width:200px; margin:0.5rem; border-radius:4px; cursor:pointer; }
+    .imgs img:hover { transform:scale(1.05); }
+    pre { white-space:pre-wrap; word-break:break-word; }
+  </style>
+</head>
+<body>
+  <h1>检索图文知识库</h1>
+  <form id="searchForm">
+    <input id="query" type="text" placeholder="输入问题..." size="60" required />
+    <button type="submit">查询</button>
+  </form>
+  <div id="results"></div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const q = document.getElementById('query').value;
+  const resp = await fetch("/search", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({q, top_k: 5})
+  });
+  const data = await resp.json();
+  render(data.results);
+});
+
+function render(results){
+  const box = document.getElementById('results');
+  box.innerHTML = "";
+  if(!results.length){
+    box.innerHTML = "<p>无结果</p>";
+    return;
+  }
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = "card";
+    div.innerHTML = `
+      <div class="score">相似度: ${r.score.toFixed(3)}</div>
+      <pre>${r.text}</pre>
+      <div class="imgs">
+        ${r.images.map(img=>`<img src="${img}" />`).join("")}
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
