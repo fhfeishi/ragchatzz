@@ -18,6 +18,7 @@
 tmp/
 tmp
 temp/ 
+.models/
 
 # 忽略pycharm的文件
 /.idea
