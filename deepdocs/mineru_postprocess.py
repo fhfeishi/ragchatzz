@@ -6,7 +6,14 @@
      
 
 # 将解析结果中的 images/ .md  复制到  parsed/
+from pathlib import Path 
 
+
+
+if __name__  == '__main__':
+    markdown_file = r"..\docs.log\zhuanli_RobotHand\CN202510118381.1-用于机器人灵巧手的直驱高转矩微特直流无刷空心杯电机\auto\CN202510118381.1-用于机器人灵巧手的直驱高转矩微特直流无刷空心杯电机.md"
+    
+    
 
      
      
