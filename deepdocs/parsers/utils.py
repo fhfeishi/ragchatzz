@@ -84,3 +84,18 @@ def num_tokens_from_string(string: str) -> int:
         return len(encoder.encode(string))
     except Exception:
         return 0
+    
+    
+    
+    
+    
+    
+# 图片图题改写:  图片1 
+
+    
+    
+    
+    
+    
+    
+    
