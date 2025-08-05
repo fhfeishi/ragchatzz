@@ -1,0 +1,21 @@
+/* src/styles/globals.css */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;              /* Logo 与标题间距 */
+  padding: 12px 24px;
+  /* background: #222;    ← 如果需要深色，再调 Logo fill 为 currentColor */
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.app-header svg {
+  width: 32px;
+  height: 32px;
+  fill: currentColor;     /* 配合 header 的 color 统一主题色 */
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #222;            /* or #fff when dark */
+}

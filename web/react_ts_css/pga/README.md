@@ -6,27 +6,27 @@ fontend-A/
     │   ├── components/
     │   │   ├── AssistantBubble.tsx      // 聊天气泡组件
     │   │   ├── MarkdownRenderer.tsx     // Markdown 渲染器
+    │   │   └── SideBar.tsx              // 侧边栏
     │   ├── pages/
     │   │   ├── Chat.tsx                 // 聊天页面
 
+    │   ├── stores/
+    │   │   ├── chatStore.ts             // 聊天状态管理 (使用 Zustand) 
+
     │   ├── styles/
-    │   │   ├── bubble.css               // 聊天气泡样式（可选）
+    │   │   ├── bubble.css               // todo 聊天气泡样式
     
-    
-    │   ├── App.tsx  // 空
-    │   ├── index.tsx  // 空
-    │   ├── styles.css  // 空
-    │   └── ...
+    │   ├── App.tsx        
+    │   ├── index.tsx      
+    │   ├── styles.css     
+    │   └── types.ts
     ├── public/ 
-    │   ├── images/
-    │   │   ├── streamline-stickies-color--bug.svg     // 智能体头像
-    │   │   ├── svg-spinners--3-dots-fade.svg          // 一个动画（智能体思考时可展示）
+    │   ├── images/       // 可能会用到的图标、图片之类的
 
-    │   ├── demoss/  // 空
-
-    
+    ├── index.html
+    ├── package-lock.json
     ├── package.json
-    ├── tsconfig.json
+    ├── vite.config.ts
     └── README.md                         // 项目说明文档
 ```
 
