@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patent Knowledge Base Assistant</title>
+  
+  <!-- Load React and ReactDOM from CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  
+  <!-- Load Babel for JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Load Tailwind CSS from CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    /* Custom styles for better markdown rendering */
+    .prose {
+      max-width: none;
+    }
+    
+    .prose :where(img):not(:where([class~="not-prose"] *)) {
+      max-width: 100%;
+      height: auto;
+      margin: 1rem 0;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .prose :where(table):not(:where([class~="not-prose"] *)) {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    
+    .prose :where(th):not(:where([class~="not-prose"] *)) {
+      background-color: #f3f4f6;
+      padding: 0.5rem;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .prose :where(td):not(:where([class~="not-prose"] *)) {
+      padding: 0.5rem;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(-25%); }
+      50% { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Components
+    const { useState, useEffect, useRef } = React;
+    
+    // MarkdownRenderer Component
+    const MarkdownRenderer = ({ content }) => {
+      const parseMarkdown = (text) => {
+        const blocks = text.split(/\n\s*\n/).filter(block => block.trim() !== '');
+        const elements = [];
+    
+        blocks.forEach((block, blockIndex) => {
+          const trimmedBlock = block.trim();
+          
+          // Handle headings
+          const headingMatch = trimmedBlock.match(/^(#{1,6})\s+(.+)$/);
+          if (headingMatch) {
+            const level = headingMatch[1].length;
+            const text = headingMatch[2].trim();
+            const HeadingTag = `h${level}`;
+            elements.push(
+              React.createElement(HeadingTag, 
+                { 
+                  key: `h-${blockIndex}`, 
+                  className: `font-bold mt-6 mb-3 text-${Math.max(2, 4 - level)}xl`
+                },
+                parseInlineMarkdown(text)
+              )
+            );
+            return;
+          }
+    
+          // Handle unordered lists
+          if (/^[-*]\s+/.test(trimmedBlock)) {
+            const items = trimmedBlock.split(/\n[-*]\s+/).filter(i => i);
+            if (items.length > 0) {
+              items[0] = items[0].replace(/^[-*]\s+/, '');
+              elements.push(
+                React.createElement('ul', 
+                  { 
+                    key: `ul-${blockIndex}`, 
+                    className: "list-disc pl-6 mb-4 space-y-2"
+                  },
+                  items.map((item, i) => 
+                    React.createElement('li', 
+                      { key: i, className: "leading-relaxed" },
+                      parseInlineMarkdown(item.trim())
+                    )
+                  )
+                )
+              );
+            }
+            return;
+          }
+    
+          // Handle ordered lists
+          if (/^\d+\.\s+/.test(trimmedBlock)) {
+            const items = trimmedBlock.split(/\n\d+\.\s+/).filter(i => i);
+            if (items.length > 0) {
+              items[0] = items[0].replace(/^\d+\.\s+/, '');
+              elements.push(
+                React.createElement('ol', 
+                  { 
+                    key: `ol-${blockIndex}`, 
+                    className: "list-decimal pl-6 mb-4 space-y-2"
+                  },
+                  items.map((item, i) => 
+                    React.createElement('li', 
+                      { key: i, className: "leading-relaxed" },
+                      parseInlineMarkdown(item.trim())
+                    )
+                  )
+                )
+              );
+            }
+            return;
+          }
+    
+          // Handle paragraphs
+          elements.push(
+            React.createElement('p', 
+              { key: `p-${blockIndex}`, className: "mb-4 leading-relaxed" },
+              parseInlineMarkdown(trimmedBlock)
+            )
+          );
+        });
+    
+        return elements;
+      };
+    
+      const parseInlineMarkdown = (text) => {
+        const processedText = text
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2" class="max-w-full h-auto my-4 rounded-lg shadow" />')
+          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
+        
+        const parts = processedText.split(/(<[^>]+>)/).filter(Boolean);
+    
+        return parts.map((part, index) => {
+          if (part.startsWith('<')) {
+            const tagMatch = part.match(/<([a-z]+)\b/);
+            if (!tagMatch) return part;
+            
+            const tag = tagMatch[1];
+            switch (tag) {
+              case 'strong':
+                return React.createElement('strong', 
+                  { key: index, className: "font-bold" },
+                  part.replace(/<\/?strong>/g, '')
+                );
+              case 'em':
+                return React.createElement('em', 
+                  { key: index, className: "italic" },
+                  part.replace(/<\/?em>/g, '')
+                );
+              case 'img':
+                const srcMatch = part.match(/src="([^"]+)"/);
+                const altMatch = part.match(/alt="([^"]+)"/);
+                return React.createElement('img', 
+                  { 
+                    key: index, 
+                    src: srcMatch ? srcMatch[1] : '', 
+                    alt: altMatch ? altMatch[1] : '',
+                    className: "max-w-full h-auto my-4 rounded-lg shadow"
+                  }
+                );
+              case 'a':
+                const hrefMatch = part.match(/href="([^"]+)"/);
+                const textMatch = part.match(/>([^<]+)</);
+                return React.createElement('a', 
+                  { 
+                    key: index, 
+                    href: hrefMatch ? hrefMatch[1] : '#', 
+                    className: "text-blue-600 hover:underline",
+                    target: "_blank",
+                    rel: "noopener noreferrer"
+                  },
+                  textMatch ? textMatch[1] : ''
+                );
+              default:
+                return part;
+            }
+          }
+          return React.createElement(React.Fragment, { key: index }, part);
+        });
+      };
+    
+      return React.createElement('div', 
+        { className: "prose prose-blue max-w-none" },
+        parseMarkdown(content)
+      );
+    };
+    
+    // MessageBubble Component
+    const MessageBubble = ({ 
+      content, 
+      isUserMessage = false,
+      timestamp = 'Just now',
+      onFeedback
+    }) => {
+      return React.createElement('div', 
+        { className: `flex ${isUserMessage ? 'justify-end' : 'justify-start'} mb-6` },
+        !isUserMessage && React.createElement('div', 
+          { className: "w-10 h-10 rounded-full bg-white border-2 border-blue-600 flex items-center justify-center mr-3 flex-shrink-0" },
+          React.createElement('svg', 
+            { 
+              xmlns: "http://www.w3.org/2000/svg", 
+              className: "h-5 w-5 text-blue-600", 
+              viewBox: "0 0 20 20", 
+              fill: "currentColor"
+            },
+            React.createElement('path', {
+              fillRule: "evenodd",
+              d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z",
+              clipRule: "evenodd"
+            })
+          )
+        ),
+        
+        React.createElement('div', 
+          { 
+            className: `rounded-2xl px-5 py-4 max-w-[80%] ${
+              isUserMessage 
+                ? 'bg-blue-600 text-white rounded-tr-none' 
+                : 'bg-white rounded-tl-none shadow-sm'
+            }`
+          },
+          React.createElement('div', 
+            { className: isUserMessage ? '' : 'text-gray-800' },
+            React.createElement(MarkdownRenderer, { content: content })
+          ),
+          
+          !isUserMessage && React.createElement('div', 
+            { className: "mt-4 flex items-center justify-between text-xs text-gray-500 border-t pt-3" },
+            React.createElement('span', null, `Patent analyzed • ${timestamp}`),
+            React.createElement('div', { className: "flex space-x-3" },
+              React.createElement('button', 
+                { 
+                  className: "hover:text-blue-200",
+                  onClick: () => onFeedback?.(true)
+                },
+                "👍 Helpful"
+              ),
+              React.createElement('button', 
+                { 
+                  className: "hover:text-blue-200",
+                  onClick: () => onFeedback?.(false)
+                },
+                "👎 Not helpful"
+              )
+            )
+          )
+        ),
+        
+        isUserMessage && React.createElement('div', 
+          { className: "w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ml-3 flex-shrink-0" },
+          React.createElement('span', { className: "text-gray-700 font-medium" }, "U")
+        )
+      );
+    };
+    
+    // ChatContainer Component
+    const ChatContainer = ({ messages, onSendMessage, isLoading = false }) => {
+      const inputRef = useRef(null);
+      const messagesEndRef = useRef(null);
+    
+      const handleSend = () => {
+        const input = inputRef.current;
+        if (input && input.value.trim()) {
+          onSendMessage(input.value);
+          input.value = '';
+        }
+      };
+    
+      const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
+      };
+    
+      // Scroll to bottom when messages change
+      useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, [messages]);
+    
+      return React.createElement('div', 
+        { className: "bg-white rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col" },
+        React.createElement('div', 
+          { className: "border-b border-gray-200 px-5 py-4 bg-gray-50" },
+          React.createElement('h2', { className: "font-semibold text-gray-800" }, "Patent Analysis Session"),
+          React.createElement('p', { className: "text-sm text-gray-500 mt-1" }, "Current conversation")
+        ),
+        
+        React.createElement('div', 
+          { className: "flex-1 overflow-y-auto p-6 bg-gray-50" },
+          React.createElement('div', { className: "max-w-3xl mx-auto" },
+            messages.map(message => 
+              React.createElement(MessageBubble, {
+                key: message.id,
+                content: message.content,
+                isUserMessage: message.isUserMessage,
+                timestamp: message.timestamp
+              })
+            ),
+            
+            isLoading && React.createElement('div', 
+              { className: "flex justify-start mb-6" },
+              React.createElement('div', 
+                { className: "w-10 h-10 rounded-full bg-white border-2 border-blue-600 flex items-center justify-center mr-3 flex-shrink-0" },
+                React.createElement('svg', 
+                  { 
+                    xmlns: "http://www.w3.org/2000/svg", 
+                    className: "h-5 w-5 text-blue-600", 
+                    viewBox: "0 0 20 20", 
+                    fill: "currentColor"
+                  },
+                  React.createElement('path', {
+                    fillRule: "evenodd",
+                    d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z",
+                    clipRule: "evenodd"
+                  })
+                )
+              ),
+              React.createElement('div', 
+                { className: "bg-white rounded-2xl rounded-tl-none px-5 py-4 shadow-sm max-w-[80%]" },
+                React.createElement('div', { className: "flex space-x-2" },
+                  React.createElement('div', { 
+                    className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce", 
+                    style: { animationDelay: '0ms' } 
+                  }),
+                  React.createElement('div', { 
+                    className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce", 
+                    style: { animationDelay: '150ms' } 
+                  }),
+                  React.createElement('div', { 
+                    className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce", 
+                    style: { animationDelay: '300ms' } 
+                  })
+                )
+              )
+            ),
+            
+            React.createElement('div', { ref: messagesEndRef })
+          )
+        ),
+        
+        React.createElement('div', 
+          { className: "border-t border-gray-200 px-5 py-4" },
+          React.createElement('div', { className: "flex space-x-3" },
+            React.createElement('input', {
+              ref: inputRef,
+              type: "text",
+              placeholder: "Ask about patents...",
+              className: "flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+              onKeyDown: handleKeyPress
+            }),
+            React.createElement('button', {
+              className: "bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors",
+              onClick: handleSend
+            }, "Send")
+          ),
+          React.createElement('p', { className: "text-xs text-gray-500 mt-2" },
+            "Try: \"Explain the energy conversion mechanism in patent US 11,484,922 B2\""
+          )
+        )
+      );
+    };
+    
+    // App Component
+    const App = () => {
+      const [messages, setMessages] = useState([]);
+      const [isLoading, setIsLoading] = useState(false);
+      
+      // Mock patent data in markdown format
+      const PATENT_RESPONSE = `
+# US Patent 11,484,922 B2: Advanced Quantum Resonance Generator
+
+## Abstract
+This patent describes a novel **quantum resonance generator** that achieves unprecedented energy efficiency through *topological quantum states*. The system demonstrates a 47.3% improvement in energy conversion efficiency compared to conventional systems.
+
+## Key Innovations
+
+- **Topological Insulator Core**: Utilizes bismuth selenide (Bi₂Se₃) nanolayers with quantum spin Hall effect
+- **Resonance Modulation System**: Dynamically adjusts frequency using piezoelectric actuators
+- **Entanglement Stabilization**: Maintains quantum coherence for >500μs at room temperature
+
+![Quantum Resonance Core Diagram](https://placehold.co/800x400/3b82f6/ffffff?text=Quantum+Core+Diagram&font=montserrat)
+
+## Performance Metrics
+
+| Parameter          | Traditional | This Patent | Improvement |
+|--------------------|-------------|-------------|-------------|
+| Energy Efficiency  | 62.1%       | **85.9%**   | +23.8%      |
+| Coherence Time     | 120μs       | **512μs**   | +327%       |
+| Operating Temp     | -196°C      | **25°C**    | +221°C      |
+
+## Implementation Details
+
+The generator comprises three critical subsystems:
+
+1. **Quantum State Preparation Module**: Creates entangled photon pairs using spontaneous parametric down-conversion
+2. **Resonance Chamber**: Maintains topological states via [magnetic flux quantization](https://example.com/flux-quantization)
+3. **Energy Harvesting Interface**: Converts quantum oscillations to electrical energy through *piezoelectric nanogenerators*
+
+> **Note**: The system achieves zero-point energy extraction without violating thermodynamic principles through quantum vacuum fluctuations.
+
+## Applications
+
+- Next-generation **medical imaging devices** with 10x resolution improvement
+- Ultra-precise [gravitational wave detectors](https://example.com/grav-waves)
+- Compact fusion reactor control systems
+- Quantum-secured communication networks
+
+![Energy Conversion Process](https://placehold.co/600x300/10b981/ffffff?text=Energy+Conversion+Flow&font=montserrat)
+
+## Claims
+
+1. A quantum resonance generator comprising: 
+   - a topological insulator core with Bi₂Se₃ nanolayers
+   - piezoelectric frequency modulation system
+   - quantum coherence stabilization mechanism
+
+2. The generator of claim 1, wherein the coherence time exceeds 500μs at ambient temperatures.
+
+3. The generator of claim 1, further comprising a zero-point energy extraction interface utilizing quantum vacuum fluctuations.
+`;
+    
+      // Initialize with a welcome message
+      useEffect(() => {
+        setMessages([
+          {
+            id: '1',
+            content: "Hello! I'm your Patent Knowledge Assistant. I can help you analyze and understand patent documents. What would you like to know today?",
+            isUserMessage: false,
+            timestamp: 'Just now'
+          }
+        ]);
+      }, []);
+    
+      const handleSendMessage = (content) => {
+        // Add user message
+        const userMessage = {
+          id: Date.now().toString(),
+          content,
+          isUserMessage: true,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        
+        setMessages(prev => [...prev, userMessage]);
+        setIsLoading(true);
+        
+        // Simulate AI response after delay
+        setTimeout(() => {
+          const aiResponse = {
+            id: (Date.now() + 1).toString(),
+            content: PATENT_RESPONSE,
+            isUserMessage: false,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          
+          setMessages(prev => [...prev, aiResponse]);
+          setIsLoading(false);
+        }, 1000);
+      };
+    
+      return React.createElement('div', 
+        { className: "min-h-screen bg-gradient-to-br from-gray-50 to-blue-50" },
+        React.createElement('header', 
+          { className: "bg-white shadow-sm" },
+          React.createElement('div', 
+            { className: "max-w-6xl mx-auto px-4 py-5" },
+            React.createElement('div', { className: "flex items-center space-x-3" },
+              React.createElement('div', 
+                { className: "bg-blue-600 w-10 h-10 rounded-xl flex items-center justify-center" },
+                React.createElement('span', { className: "text-white font-bold text-xl" }, "Q")
+              ),
+              React.createElement('h1', { className: "text-2xl font-bold text-gray-800" }, "Patent Knowledge Base Assistant")
+            ),
+            React.createElement('p', 
+              { className: "text-gray-600 mt-2 max-w-3xl" },
+              "Advanced quantum technology patent analyzer with semantic search capabilities"
+            )
+          )
+        ),
+    
+        React.createElement('main', 
+          { className: "max-w-6xl mx-auto px-4 py-8" },
+          React.createElement('div', { className: "grid grid-cols-1 lg:grid-cols-3 gap-8" },
+            // Sidebar
+            React.createElement('div', { className: "lg:col-span-1" },
+              React.createElement('div', 
+                { className: "bg-white rounded-xl shadow-sm p-5 sticky top-6" },
+                React.createElement('h2', { className: "font-bold text-lg mb-4 text-gray-800" }, "Patent Search"),
+                React.createElement('p', { className: "text-gray-500" }, "History and search functionality will be added in the next step")
+              )
+            ),
+    
+            // Chat Area
+            React.createElement('div', { className: "lg:col-span-2" },
+              React.createElement(ChatContainer, { 
+                messages: messages, 
+                onSendMessage: handleSendMessage,
+                isLoading: isLoading
+              })
+            )
+          )
+        ),
+    
+        React.createElement('footer', 
+          { className: "border-t border-gray-200 mt-12" },
+          React.createElement('div', { className: "max-w-6xl mx-auto px-4 py-6" },
+            React.createElement('div', { className: "flex flex-col md:flex-row justify-between items-center" },
+              React.createElement('div', { className: "flex items-center space-x-2 mb-4 md:mb-0" },
+                React.createElement('div', 
+                  { className: "bg-gray-800 w-8 h-8 rounded-lg flex items-center justify-center" },
+                  React.createElement('span', { className: "text-white font-bold" }, "KB")
+                ),
+                React.createElement('span', { className: "font-medium text-gray-700" }, "Patent Knowledge Base v2.1")
+              ),
+              React.createElement('div', { className: "text-gray-500 text-sm" },
+                "© 2023 Patent Intelligence System. All patents analyzed are property of their respective owners."
+              )
+            )
+          )
+        )
+      );
+    };
+    
+    // Render the app
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      React.createElement(React.StrictMode, null, React.createElement(App))
+    );
+  </script>
+</body>
+</html>
