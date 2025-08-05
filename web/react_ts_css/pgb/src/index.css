@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for better markdown rendering */
+.prose img {
+  @apply max-w-full h-auto my-4 rounded-lg shadow;
+}
+
+.prose table {
+  @apply w-full border-collapse my-4;
+}
+
+.prose th {
+  @apply bg-gray-100 px-4 py-2 border;
+}
+
+.prose td {
+  @apply px-4 py-2 border;
+}

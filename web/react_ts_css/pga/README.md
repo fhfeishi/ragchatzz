@@ -35,7 +35,7 @@ fontend-A/
 - start
 ```
 npm install react react-dom @types/react @types/react-dom
-
+npm install -D vite @vitejs/plugin-react
 
 npm install typescript @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-unicorn eslint-plugin-react-refresh
 npm install postcss postcss-cli tailwindcss autoprefixer
