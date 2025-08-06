@@ -1,61 +1,69 @@
 // src/App.tsx
 import React, { useState, useEffect } from 'react';
 import SideBar from '@/components/SideBar';
-import Chat from '@/pages/Chat';
-import { useChatStore } from '@/stores/chatStore';
-import { useUiStore } from '@/stores/uiStore';
+import Chat from '@/pages/Chat';      // 聊天内容组件
+import { useChatStore } from '@/stores/chatStore';  // 会话状态管理（Zustand）
+import { useUiStore } from '@/stores/uiStore';   // UI 状态管理（如侧边栏展开/收起）
 import NewChat from '@/assets/icons/new_chat.svg?react';
 import SideButton from '@/assets/icons/side.svg?react';
+import SessionTitleEditor from '@/components/SessionTitleEditor'; // 修改会话标签
 import '@/styles.css';
 
 const App: React.FC = () => {
+  // 从 UI Store 获取侧边栏状态和切换函数
   const { isSidebarOpen, toggleSidebar } = useUiStore();
+  // 从 Chat Store 获取会话数据和操作方法
   const { conversations, activeId, addConversation, updateSessionTitle } = useChatStore();
 
   // ---------------- 当前会话标题 ----------------
+  // 找到当前激活的会话
   const currentSession = conversations.find((c) => c.id === activeId);
   const currentTitle = currentSession?.title || '新会话';
+  // 使用本地状态管理输入框值（受控组件）
   const [title, setTitle] = useState(currentTitle);
 
+  // 当 currentTitle 变化时（如切换会话），同步更新本地状态
   useEffect(() => {
     setTitle(currentTitle);
   }, [currentTitle]);
 
+  // 处理标题输入框变化
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    setTitle(newTitle);
+    setTitle(newTitle); // 更新输入框显示
+    // 如果当前会话存在，同步更新到全局状态
     if (currentSession) updateSessionTitle(currentSession.id, newTitle);
   };
 
   return (
     <div className="app">
       {/* ---------- 顶部智能标题栏 ---------- */}
+      {/* 固定在顶部的标题栏，始终显示 */}
       <header className="app-header">
-        {/* 折叠态：显示两枚按钮 */}
+        {/* 折叠态：当侧边栏关闭时，显示两个按钮 */}
         {!isSidebarOpen && (
           <>
+            {/* 点击展开侧边栏 */}
             <button onClick={toggleSidebar} title="展开导航">
               <SideButton className="w-5 h-5" />
             </button>
+            {/* 点击新建会话 */}
             <button onClick={addConversation} title="新建会话">
               <NewChat className="w-5 h-5" />
             </button>
           </>
         )}
 
-        {/* 标题输入框（始终可编辑） */}
-        <input
-          type="text"
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="点击编辑会话标题"
-        />
+        {/* 对话标签修改 */}
+        <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />
       </header>
 
       {/* ---------- 主体区域 ---------- */}
       <div className="app-body">
+        {/* 条件渲染：仅当侧边栏开启时显示 SideBar */}
         {isSidebarOpen && <SideBar />}
-        <main className="chat-center">
+        <main className="chat-center" style={{width: isSidebarOpen ? `calc(100% -260px)`: `99%`}}>
+
           <Chat />
         </main>
       </div>

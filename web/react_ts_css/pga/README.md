@@ -8,18 +8,19 @@ fontend-A/
     │   │   ├── AssistantBubble.tsx      // 聊天气泡组件
     │   │   ├── MarkdownRenderer.module.css
     │   │   ├── MarkdownRenderer.tsx     // Markdown 渲染器
+    │   │   ├── SessionTitleEditor.tsx   // 会话标题编辑器
     │   │   ├── SideBar.module.css
     │   │   └── SideBar.tsx              // 侧边栏
     │   ├── pages/
-    │   │   ├── 
-    │   │   ├── 
+    │   │   ├── SidebarTogglePlaceholder.module.css
+    │   │   ├── SidebarTogglePlaceholder.tsx  // 侧边栏切换占位符
     │   │   └── Chat.tsx                 // 聊天页面
     │   ├── stores/
-    │   │   ├── uiStore.ts
+    │   │   ├── uiStore.ts               // UI 状态管理 (使用 Zustand)
     │   │   └── chatStore.ts             // 聊天状态管理 (使用 Zustand) 
     │   ├── App.tsx        
     │   ├── index.tsx      
-    │   ├── styles.css     
+    │   ├── styles.css     // App.tsx 全局样式
     │   └── types.ts
     ├── public/ 
     │   ├── images/       // 可能会用到的图标、图片之类的

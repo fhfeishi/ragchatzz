@@ -6,7 +6,8 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github.css';
-import styles from '@/components/MarkdownRenderer.module.css';
+// 移除 styles，因为样式由外层控制
+// import styles from '@/components/MarkdownRenderer.module.css';
 
 interface Props {
   source: string;
@@ -14,41 +15,62 @@ interface Props {
 
 const MarkdownRenderer: React.FC<Props> = ({ source }) => {
   return (
-    <div className={styles.markdown}> {/* 在外层包裹 */}
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
-        components={{
-          img: ({ ...props }) => (
-            <img
-              {...props}
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-                borderRadius: 8,
-                marginTop: 8,
-              }}
-              alt={props.alt || 'image'}
-            />
-          ),
-          blockquote: ({ children }) => (
-            <blockquote
-              style={{
-                margin: '8px 0',
-                paddingLeft: 12,
-                borderLeft: '4px solid #ccc',
-                color: '#555',
-              }}
-            >
-              {children}
-            </blockquote>
-          ),
-          // 其他标签如 h1, p, a 等也可以自定义
-        }}
-      >
-        {source}
-      </ReactMarkdown>
-    </div>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+      components={{
+        // 图片
+        img: ({ ...props }) => (
+          <img
+            {...props}
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              borderRadius: 8,
+              marginTop: 8,
+            }}
+            alt={props.alt || 'image'}
+          />
+        ),
+        // 引用
+        blockquote: ({ children }) => (
+          <blockquote
+            style={{
+              margin: '0.6em 0',
+              paddingLeft: 12,
+              borderLeft: '4px solid #ddd',
+              color: '#666',
+            }}
+          >
+            {children}
+          </blockquote>
+        ),
+        // 链接
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#1677ff' }}>
+            {children}
+          </a>
+        ),
+        // 表格
+        table: ({ children }) => (
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '0.6em', marginBottom: '0.6em' }}>
+            {children}
+          </table>
+        ),
+        th: ({ children }) => (
+          <th style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'left', backgroundColor: '#f5f5f5' }}>
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td style={{ border: '1px solid #ddd', padding: '6px' }}>
+            {children}
+          </td>
+        ),
+      }}
+    >
+      {source}
+    </ReactMarkdown>
   );
 };
 

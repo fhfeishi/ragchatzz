@@ -1,7 +1,9 @@
 // src/pages/Chat.tsx
-import React, { useState, KeyboardEvent } from 'react';
-import AssistantBubble from '../components/AssistantBubble';
-import { useChatStore } from '../stores/chatStore';
+import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
+import AssistantBubble from '@/components/AssistantBubble';
+import { useChatStore } from '@/stores/chatStore';
+import styles from './Chat.module.css';
+
 
 // 示例回答    --->  todo. 之后就是获取 llm-answer的markdown
 const fakeMarkdown = `
@@ -12,7 +14,7 @@ const fakeMarkdown = `
 - 结构紧凑：所有执行器均藏在手掌内，手指本体外径≤14 mm，可直接替换现有夹爪末端。
 - 低成本复用：钢丝绳采用标准 0.3 mm 航空级钢索，维修时无需拆整手，30 秒快拆更换。
   
-![图1-图1的相关描述](demoss/图1.jpg)
+![图1-图1的相关描述](/demoss/图1.jpg)
 <center>图1-图1的相关描述</center>
 
 
@@ -22,7 +24,7 @@ const fakeMarkdown = `
 - 高负载-低回差：丝杠导程 0.5 mm，理论传动效率 90%，在指尖可输出 5 kg 持续力而回差＜0.1°，满足工业插拔、拧紧等高精度场景。
 - 模块化手指：拇指、食指可热插拔为 3 DOF 高灵活度模块，其余手指可替换 1 DOF 低成本模块，同一手掌兼容两种配置。
 
-![图2-图2的相关描述](demoss/图2.jpg)
+![图2-图2的相关描述](/demoss/图2.jpg)
 <center>图2-图2的相关描述</center>
 
 
@@ -32,7 +34,7 @@ const fakeMarkdown = `
 -  全掌高密度感知：指尖、指腹、掌面共布置 240 点柔性触觉阵列＋1 颗微型激光雷达，实现 3 mm 分辨率、0.05 g 力变化检测，支持“盲抓”柔软物体。[引用4腾讯网](https://news.qq.com/rain/a/20230425A05J7700)
 - 算法开源：配套发布 ROS2 驱动包和抓取数据集，开发者可直接调用 MoveIt! 和 YOLO-Grasp 模型完成二次开发。[引用5-知乎](https://zhuanlan.zhihu.com/p/625631528)
 
-![图3-图3的相关描述](demoss/图3.jpg)
+![图3-图3的相关描述](/demoss/图3.jpg)
 <center>图3-图3的相关描述</center>
 `;
 
@@ -53,6 +55,26 @@ const Chat: React.FC = () => {
   const messages = activeConv?.messages ?? [];
 
   const [input, setInput] = React.useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const chatMainRef = useRef<HTMLDivElement>(null);
+
+  // 获取多轮对话区域的宽度
+  const chatWidth = chatMainRef.current?.clientWidth || 0;
+
+  // 自动调整 textarea 高度
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
+
+  // 滚动到底部
+  useEffect(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // 用户发送
   const handleSend = () => {
@@ -76,30 +98,40 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="chat-container">
+    <div className={styles.chatContainer}>
       {/* 对话列表 */}
-      <main className="chat-main">
-        {messages.map(msg =>
-          msg.role === 'assistant' ? (
-            <AssistantBubble key={msg.id} content={msg.content} />
-          ) : (
-            <div key={msg.id} className="user-bubble">
-              {msg.content}
+      <main className={styles.chatMain} ref={chatMainRef}>
+        {messages.length === 0 ? (
+          <div className={styles.emptyState}>开始你的第一段对话吧！</div>
+        ): (
+          messages.map(msg => (
+            <div
+              key={msg.id}
+              className={`${styles.messageBubble} ${
+                msg.role === 'user' ? styles.userBubble : styles.assistantBubble
+              }`}
+            >
+              {msg.role === 'assistant' ? (
+                <AssistantBubble content={msg.content} />
+              ) : (
+                msg.content
+              )}
             </div>
-          )
+          ))
         )}
       </main>
 
-      {/* 输入框 */}
-      <footer className="chat-footer">
+      {/* 输入区域 */}
+      <footer className={styles.chatFooter}>
         <textarea
-          rows={1}
+          ref={textareaRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="回车发送，Shift+Enter 换行"
+          style={{ resize: 'none', overflow: 'hidden' }}
         />
-        <button onClick={handleSend}>发送</button>
+        <button onClick={handleSend} className={styles.sendBtn}>发送</button>
       </footer>
     </div>
   );
