@@ -6,6 +6,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github.css';
+import styles from '@/components/MarkdownRenderer.module.css';
 
 interface Props {
   source: string;
@@ -13,38 +14,41 @@ interface Props {
 
 const MarkdownRenderer: React.FC<Props> = ({ source }) => {
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
-      components={{
-        img: ({ ...props }) => (
-          <img
-            {...props}
-            style={{
-              maxWidth: '100%',
-              height: 'auto',
-              borderRadius: '8px',
-              marginTop: '8px',
-            }}
-            alt={props.alt || 'image'}
-          />
-        ),
-        blockquote: ({ children }) => (
-          <blockquote
-            style={{
-              margin: '8px 0',
-              paddingLeft: '12px',
-              borderLeft: '4px solid #ccc',
-              color: '#555',
-            }}
-          >
-            {children}
-          </blockquote>
-        ),
-      }}
-    >
-      {source}
-    </ReactMarkdown>
+    <div className={styles.markdown}> {/* 在外层包裹 */}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+        components={{
+          img: ({ ...props }) => (
+            <img
+              {...props}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: 8,
+                marginTop: 8,
+              }}
+              alt={props.alt || 'image'}
+            />
+          ),
+          blockquote: ({ children }) => (
+            <blockquote
+              style={{
+                margin: '8px 0',
+                paddingLeft: 12,
+                borderLeft: '4px solid #ccc',
+                color: '#555',
+              }}
+            >
+              {children}
+            </blockquote>
+          ),
+          // 其他标签如 h1, p, a 等也可以自定义
+        }}
+      >
+        {source}
+      </ReactMarkdown>
+    </div>
   );
 };
 

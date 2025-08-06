@@ -1,0 +1,40 @@
+/* SidebarTogglePlaceholder.module.css */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.iconWrapper {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+}
+
+.iconWrapper:hover {
+  background-color: #e9ecef;
+  transform: scale(1.05);
+}
+
+.tooltip {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #333;
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.iconWrapper:hover .tooltip {
+  opacity: 1;
+}

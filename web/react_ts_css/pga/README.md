@@ -4,25 +4,26 @@
 fontend-A/
     ├── src/
     │   ├── components/
+    │   │   ├── AssistantBubble.module.css   
     │   │   ├── AssistantBubble.tsx      // 聊天气泡组件
+    │   │   ├── MarkdownRenderer.module.css
     │   │   ├── MarkdownRenderer.tsx     // Markdown 渲染器
+    │   │   ├── SideBar.module.css
     │   │   └── SideBar.tsx              // 侧边栏
     │   ├── pages/
-    │   │   ├── Chat.tsx                 // 聊天页面
-
+    │   │   ├── 
+    │   │   ├── 
+    │   │   └── Chat.tsx                 // 聊天页面
     │   ├── stores/
-    │   │   ├── chatStore.ts             // 聊天状态管理 (使用 Zustand) 
-
-    │   ├── styles/
-    │   │   ├── bubble.css               // todo 聊天气泡样式
-    
+    │   │   ├── uiStore.ts
+    │   │   └── chatStore.ts             // 聊天状态管理 (使用 Zustand) 
     │   ├── App.tsx        
     │   ├── index.tsx      
     │   ├── styles.css     
     │   └── types.ts
     ├── public/ 
     │   ├── images/       // 可能会用到的图标、图片之类的
-
+    │   └── gkgd/         // background 背景图 如需要
     ├── index.html
     ├── package-lock.json
     ├── package.json

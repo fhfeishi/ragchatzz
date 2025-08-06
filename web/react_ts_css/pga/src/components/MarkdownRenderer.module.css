@@ -1,0 +1,13 @@
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.markdown blockquote {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 4px solid #ccc;
+  color: #555;
+}
