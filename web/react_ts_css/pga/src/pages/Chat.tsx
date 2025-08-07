@@ -2,8 +2,8 @@
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import AssistantBubble from '@/components/AssistantBubble';
 import { useChatStore } from '@/stores/chatStore';
-import styles from './Chat.module.css';
-
+import styles from '@/pages/Chat.module.css';
+import { Message } from '@/types.ts'
 
 // 示例回答    --->  todo. 之后就是获取 llm-answer的markdown
 const fakeMarkdown = `
@@ -15,7 +15,7 @@ const fakeMarkdown = `
 - 低成本复用：钢丝绳采用标准 0.3 mm 航空级钢索，维修时无需拆整手，30 秒快拆更换。
   
 ![图1-图1的相关描述](/demoss/图1.jpg)
-<center>图1-图1的相关描述</center>
+<p align="center">图1-图1的相关描述</p>
 
 
 ## 2. 新剑机电《无框力矩电机＋行星滚柱丝杠灵巧手》公开号：CN1178xxxxxA（2024-12）
@@ -25,7 +25,7 @@ const fakeMarkdown = `
 - 模块化手指：拇指、食指可热插拔为 3 DOF 高灵活度模块，其余手指可替换 1 DOF 低成本模块，同一手掌兼容两种配置。
 
 ![图2-图2的相关描述](/demoss/图2.jpg)
-<center>图2-图2的相关描述</center>
+<p align="center">图2-图2的相关描述</p>
 
 
 ## 3. 腾讯 Robotics X《TRX-Hand 刚柔混合驱动灵巧手》公开号：CN1169xxxxxA（2024-06）
@@ -35,14 +35,9 @@ const fakeMarkdown = `
 - 算法开源：配套发布 ROS2 驱动包和抓取数据集，开发者可直接调用 MoveIt! 和 YOLO-Grasp 模型完成二次开发。[引用5-知乎](https://zhuanlan.zhihu.com/p/625631528)
 
 ![图3-图3的相关描述](/demoss/图3.jpg)
-<center>图3-图3的相关描述</center>
+<p align="center">图3-图3的相关描述</p>
 `;
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
 
 const Chat: React.FC = () => {
   const {
@@ -55,24 +50,23 @@ const Chat: React.FC = () => {
   const messages = activeConv?.messages ?? [];
 
   const [input, setInput] = React.useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const chatMainRef = useRef<HTMLDivElement>(null);
-
-  // 获取多轮对话区域的宽度
-  const chatWidth = chatMainRef.current?.clientWidth || 0;
+  const textareaRef = useRef<HTMLTextAreaElement | null > (null);
+  const chatMainRef = useRef<HTMLDivElement | null > (null);
 
   // 自动调整 textarea 高度
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [input]);
 
   // 滚动到底部
   useEffect(() => {
-    if (chatMainRef.current) {
-      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight;
+    const chatmain = chatMainRef.current;
+    if (chatmain) {
+      chatmain.scrollTop = chatmain.scrollHeight;
     }
   }, [messages]);
 
@@ -80,7 +74,7 @@ const Chat: React.FC = () => {
   const handleSend = () => {
     if (!input.trim()) return;
     // 把用户消息加到当前会话
-    addMessage(activeId!, { role: 'user', content: input });
+    addMessage(activeId!, { role: 'user',  content: input });
     setInput('');
 
     // 模拟 LLM 回答

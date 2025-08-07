@@ -3,18 +3,15 @@
 import React from 'react';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { saveAs } from 'file-saver';   // 轻量下载库
-// npm i file-saver
-// npm i -D @types/file-saver
 import * as docx from 'docx';
-import Download from '@/assets/icons/download.svg?react'; // download 图标
-import styles from './AssistantBubble.module.css';
+import Download from '@/assets/icons/downloada.svg?react'; // download 图标
+import styles from '@/components/AssistantBubble.module.css';
 
 interface Props {
   content: string;
-  maxWidth: number;  // 接收最大宽度
 }
 
-const AssistantBubble: React.FC<Props> = ({ content, maxWidth }) => {
+const AssistantBubble: React.FC<Props> = ({ content}) => {
   // 保存 Markdown
   const saveMd = () => {
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
@@ -42,7 +39,7 @@ const AssistantBubble: React.FC<Props> = ({ content, maxWidth }) => {
   };
 
   return (
-    <div className={styles.bubble} style={{maxWidth}}>
+    <div className={styles.bubble} >
       {/* 只渲染内容，不加额外容器 避免文本的双重渲染 | chat终会渲染的*/}
       <MarkdownRenderer source={content} />
 

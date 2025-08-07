@@ -12,6 +12,131 @@ from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores.utils import filter_complex_metadata # 过滤复杂元数据 chroma只支持: str int float bool None
+from langchain_core.documents import Document
+from collections import OrderedDict
+from pypdf import PdfReader  # get pubno
+
+
+class zhuanli_parser:
+    def __init__(self, markdown_file: str):
+        self.markdown_file = markdown_file
+        self.ims_dir = Path(markdown_file).parent / "images"
+        self.data_dir = os.path.dirname(markdown_file)
+        self.loaded_docs = []
+        self.metada_schema = OrderedDict({
+            "pubno": str,
+            "patent_name": str,
+            "applier": str,
+            "apply_time": str,
+            "fig_list": dict,
+        }) # 申请公布号 专利名称 申请人 发明人 申请时间 配图{"图1": [str(description),str(path/to/1.jpg)], }
+    
+    def __call__(self):
+        self.loaded_docs = self._load_with_image()
+        
+    def _extract_imMatadata(self):
+        with open(self.markdown_file, "r", encoding='utf-8') as f:
+            content = f.read()
+        """ 从markdown文本中提取图片元数据 """
+        # 1 提取“附图说明”标题及其内容（直到下一个标题或文件结尾）
+        pattern = re.compile(
+            r'^(#{1,3})\s*附图说明\s*\n+\s*([\s\S]*?)(?=^#{1,3}|\Z)',
+            re.MULTILINE)
+        match = pattern.search(content)
+        if not match:
+            print(f"⚠️ markdown file {md_path.stem} 未找到 '附图说明' 章节，跳过处理。")
+            return content
+
+        header_line = match.group(1)  # 比如 "##"
+        body = match.group(2).strip()
+        img_map = {}
+        # 匹配：图片行 + 紧接着的“图X”行
+        img_blocks = re.findall(r'!\[.*?\]\((.*?)\)\s*\n\s*图(\d+)', text, re.IGNORECASE)
+        for path, num in img_blocks:
+            img_map[f"图{num}"] = path.strip()
+
+        # 获取图片的图题： "图x": [decs, img_path]
+        fig_num, desc = body.groups()
+        img_path = img_map.get(f"图{fig_num}")
+        img_path = os.path.abspath(img_path)
+        assert os.path.exists(img_path), f"图片路径不存在: {img_path}"
+        if img_path:
+            return {"图"+fig_num: [{desc}, str(img_path)]}
+        else:
+            print(f"⚠️ {os.path.basename(self.markdown_file)}未找到图{fig_num}的路径，跳过处理。")
+            return match.group(0)  # 无图则保持原样
+            
+            
+    
+    def _extract_pubno(self):
+        # 专利pdf第一页最后一行 -> 申请公告号
+        pdfp = str(self.markdown_file)[:-3] + ".pdf"
+        reader = PdfReader(pdfp)
+        text_1 = reader.pages[0].extract_text() or ""
+        last_line = text_1.strip().splitlines()[-1]
+
+        # 去掉空格后匹配
+        compact = re.sub(r'\s+', '', last_line.upper())
+        m = re.search(r'(CN[A-Z0-9]{9,13})', compact)
+        if m:
+            return m.group(0)
+        else:
+            raise ValueError(f"专利 {os.path.basename(pdfp)} 未找到 申请公告号 的字符串")    
+        
+    
+    def _load_with_image(self) -> List[Document]:
+        with open(self.markdown_file, "r", encoding='utf-8') as f:
+            content = f.read()
+            image_paths = self._extract_image_paths(content)
+            abs_image_paths = [os.path.join(self.data_dir, image_path) for image_path in image_paths]
+            
+            doc = Document(
+                page = content,
+                metadata = OrderedDict({
+                    "source_path": str(self.markdown_file),
+                    "file_stem": os.path.basename(self.markdown_file).split(".")[0],
+                    "file_suffix": os.path.basename(self.markdown_file).split(".")[1],
+                    "file_size": os.path.getsize(self.markdown_file),
+                    "image_paths": abs_image_paths
+                })  # 
+            ) 
+            return [doc]
+    def pipeline(self):
+        pass 
+
+
+def get_im_matadata(markdown_text: str):
+    """ 从markdown文本中提取图片元数据 """
+    
+    # 1 提取“附图说明”标题及其内容（直到下一个标题或文件结尾）
+    pattern = re.compile(
+        r'^(#{1,3})\s*附图说明\s*\n+\s*([\s\S]*?)(?=^#{1,3}|\Z)',
+        re.MULTILINE)
+    match = pattern.search(text)
+    if not match:
+        print(f"⚠️ markdown file {md_path.stem} 未找到 '附图说明' 章节，跳过处理。")
+        return text
+
+    header_line = match.group(1)  # 比如 "##"
+    body = match.group(2).strip()
+    img_map = {}
+    # 匹配：图片行 + 紧接着的“图X”行
+    img_blocks = re.findall(r'!\[.*?\]\((.*?)\)\s*\n\s*图(\d+)', text, re.IGNORECASE)
+    for path, num in img_blocks:
+        img_map[f"图{num}"] = path.strip()
+
+    # 获取图片的图题： 图x-decs
+    def repl(match):
+        fig_num, desc = match.groups()
+        img_path = img_map.get(f"图{fig_num}")
+        if img_path:
+            return {"图"+fig_num: [{desc}, str(img_path)]}
+        else:
+            print(f"⚠️ {os.path.basename(self.markdown_file)}未找到图{fig_num}的路径，跳过处理。")
+            return match.group(0)  # 无图则保持原样
+        
+
+
 
 
 class VectorIngestor:
@@ -78,7 +203,7 @@ class VectorIngestor:
                 # 加载所有 .md 文件
                 for md_file in md_dir.glob("*.md"):
                     try:
-                        loader = UnstructuredMarkdownLoader(str(md_file), mode="elements")  # single 
+                        loader = UnstructuredMarkdownLoader(str(md_file), mode="single")  # single 
                         loaded_docs = loader.load()
 
                         for doc in loaded_docs:
@@ -191,8 +316,8 @@ if __name__ =="__main__":
         r"..\docs.log\zhuanli_RobotFeet",
         r"..\docs.log\zhuanli_RobotHand"
     ],
-    "model_dir_local": "../temp/mineru_models/Qwen3-Embedding-0.6B",
-    "store_dir": "../docs.log/chroma_db/.zhuanli_vectdb",
+    "model_dir_local": r"../deepdocs/mineru_models/Qwen3-Embedding-0.6B",
+    "store_dir": r"../docs.log/chroma_db/.zhuanli_vectdb",
     "collection_name": "multi_domain_knowledge",
     "embed_model": "Qwen/Qwen3-Embedding-0.6B",
     "chunk_size": 480,  # 

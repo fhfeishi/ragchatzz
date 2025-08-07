@@ -37,33 +37,55 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      {/* ---------- 顶部智能标题栏 ---------- */}
-      {/* 固定在顶部的标题栏，始终显示 */}
-      <header className="app-header">
-        {/* 折叠态：当侧边栏关闭时，显示两个按钮 */}
-        {!isSidebarOpen && (
-          <>
-            {/* 点击展开侧边栏 */}
+      {/* ========== 收起状态：全局固定标题栏 ========== */}
+      {!isSidebarOpen && (
+          <header className="app-header collapsed">
             <button onClick={toggleSidebar} title="展开导航">
               <SideButton className="w-5 h-5" />
             </button>
-            {/* 点击新建会话 */}
             <button onClick={addConversation} title="新建会话">
               <NewChat className="w-5 h-5" />
             </button>
-          </>
-        )}
+            <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />
+          </header>
+      )}
 
-        {/* 对话标签修改 */}
-        <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />
-      </header>
-
-      {/* ---------- 主体区域 ---------- */}
+      {/* ========== 主体区域 ========== */}
       <div className="app-body">
-        {/* 条件渲染：仅当侧边栏开启时显示 SideBar */}
         {isSidebarOpen && <SideBar />}
-        <main className="chat-center" style={{width: isSidebarOpen ? `calc(100% -260px)`: `99%`}}>
+        <main className="chat-center">
+          {/* ========== 展开状态：聊天区内标题栏 ========== */}
+          {isSidebarOpen && (
+              <div className="chat-header expanded">
+                <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />
+              </div>
+          )}
 
+      {/*/!* ---------- 主体区域 ---------- *!/*/}
+      {/*<div className="app-body">*/}
+      {/*  /!* 左侧边栏 *!/*/}
+      {/*  {isSidebarOpen && <SideBar />}*/}
+
+      {/*  /!* 右侧聊天区 *!/*/}
+      {/*  <main className="chat-center" >*/}
+      {/*    /!* 情况1：侧边栏收起 → 标题栏固定在顶部 *!/*/}
+      {/*    {!isSidebarOpen &&(*/}
+      {/*        <header className="app-header collapsed">*/}
+      {/*          <button onClick={toggleSidebar} title="展开导航">*/}
+      {/*            <SideButton className="w-5 h-5" />*/}
+      {/*          </button>*/}
+      {/*          <button onClick={addConversation} title={"新建会话"}>*/}
+      {/*            <NewChat className="w-5 h-5"/>*/}
+      {/*          </button>*/}
+      {/*          <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />*/}
+      {/*        </header>*/}
+      {/*    )}*/}
+      {/*    /!* 情况2：侧边栏展开 → 标题栏在聊天区内顶部 *!/*/}
+      {/*    {isSidebarOpen && (*/}
+      {/*        <div className="chat-header expanded">*/}
+      {/*          <SessionTitleEditor currentTitle={currentTitle} sessionId={currentSession?.id} />*/}
+      {/*        </div>*/}
+      {/*    )}*/}
           <Chat />
         </main>
       </div>

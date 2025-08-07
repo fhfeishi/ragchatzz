@@ -8,5 +8,5 @@ export interface Conversation {
   id: string;
   title: string;
   messages: Message[];
-  ts: number; // 创建时间
+  ts: number; // 创建时间戳
 }

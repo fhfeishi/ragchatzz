@@ -13,10 +13,10 @@ fontend-A/
     │   │   └── SideBar.tsx              // 侧边栏
     │   ├── pages/
     │   │   ├── SidebarTogglePlaceholder.module.css
-    │   │   ├── SidebarTogglePlaceholder.tsx  // 侧边栏切换占位符
+    │   │   ├── SidebarTogglePlaceholder.tsx  // -
     │   │   └── Chat.tsx                 // 聊天页面
     │   ├── stores/
-    │   │   ├── uiStore.ts               // UI 状态管理 (使用 Zustand)
+    │   │   ├── uiStore.ts               // -
     │   │   └── chatStore.ts             // 聊天状态管理 (使用 Zustand) 
     │   ├── App.tsx        
     │   ├── index.tsx      
@@ -34,14 +34,18 @@ fontend-A/
 
 参考工作1 [link](https://github.com/zhttyy520/ai-medical-assistant)
 
-- start
-```
+* start-bash
+```bash
 npm install react react-dom @types/react @types/react-dom
 npm install -D vite @vitejs/plugin-react
 
 npm install typescript @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-unicorn eslint-plugin-react-refresh
 npm install postcss postcss-cli tailwindcss autoprefixer
 npm install react-markdown remark-gfm
+
+# 文件下载库 file-saver
+npm i file-saver
+npm i -D @types/file-saver
 ```
 
 - answer-fake

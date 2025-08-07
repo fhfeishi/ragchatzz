@@ -1,7 +1,7 @@
 // src/stores/chatStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Conversation, Message } from '../types';
+import { Conversation, Message } from '@/types';
 
 // 一个简单的模拟函数，用于根据用户的第一条消息生成会话标题
 // 在实际应用中，这里可以调用 AI API 来生成更精准的标题
@@ -82,7 +82,7 @@ export const useChatStore = create<{
         }));
       },
 
-      // 新增：为指定会话自动生成标题
+      // 为指定会话自动生成标题
       autoGenerateTitle(conversationId) {
         set((state) => {
           const conv = state.conversations.find(c => c.id === conversationId);

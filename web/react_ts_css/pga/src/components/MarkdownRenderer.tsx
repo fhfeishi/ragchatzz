@@ -6,8 +6,6 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github.css';
-// 移除 styles，因为样式由外层控制
-// import styles from '@/components/MarkdownRenderer.module.css';
 
 interface Props {
   source: string;
