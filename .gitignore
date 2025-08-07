@@ -20,8 +20,8 @@ tmp
 temp/ 
 .models/
 
-# 忽略pycharm的文件
-/.idea
+# 忽略所有.idea
+*/.idea/*
 
 # 忽略所有的 .pt .pth .ckpt .pdparams 权重文件
 *.pt
@@ -62,8 +62,7 @@ debug/
 # 忽略所有的 __pycache__
 **/__pycache__/*
 
-# 忽略所有.idea
-.idea/*
+
 
 # 但是跟踪名为 `trace.log` 的文件
 !trace.log
